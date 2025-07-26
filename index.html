@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr" x-data="galleryApp()">
+<html lang="fr" x-data="galleryApp()" :class="{ 'dark': isDark }" x-init="initTheme()">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,51 +9,95 @@
 </head>
 <body>
 
-  <header>
+  <!-- HEADER -->
+  <header class="page-header">
     <h1>✨ Galerie Meifox ✨</h1>
+    <button @click="toggleTheme" class="theme-toggle-fixed">
+      <span x-text="isDark ? '☀️ Mode clair' : '🌙 Mode sombre'"></span>
+    </button>
   </header>
 
+<div class="content-wrapper">
+  <!-- MENU -->
+  <nav class="menu">
+    <button @click="setCategory('all')" :class="{ 'active': selectedCategory === 'all' }">All 🖼️</button>
+    <button @click="setCategory('xavier')" :class="{ 'active': selectedCategory === 'xavier' }">Xavier ✨</button>
+    <button @click="setCategory('zayne')" :class="{ 'active': selectedCategory === 'zayne' }">Zayne 🍐</button>
+    <button @click="setCategory('rafayel')" :class="{ 'active': selectedCategory === 'rafayel' }">Rafayel 🐟</button>
+    <button @click="setCategory('sylus')" :class="{ 'active': selectedCategory === 'sylus' }">Sylus 🐦‍⬛</button>
+    <button @click="setCategory('caleb')" :class="{ 'active': selectedCategory === 'caleb' }">Caleb 🍎</button>
+  </nav>
+
+  <!-- GALERIE -->
   <main class="gallery">
-    <!-- Tu peux dupliquer ces blocs -->
     <template x-for="(image, index) in images" :key="index">
-      <img 
-        :src="image" 
-        alt="Image galerie" 
-        @click="openLightbox(image)"
-      >
+      <img :src="image" alt="Image galerie" @click="openLightbox(image)">
     </template>
   </main>
+</div>
 
-  <!-- Lightbox -->
+  <!-- LIGHTBOX -->
   <div class="lightbox" x-show="lightboxOpen" @click.self="closeLightbox">
     <img :src="lightboxImage" alt="Zoom" />
     <button class="close-btn" @click="closeLightbox">✖</button>
   </div>
 
-  <script>
-    function galleryApp() {
-      return {
-        images: [
-        'images/Paper175214657827.png',
-        'images/Paper1752005093252.png',
-        'images/Paper173790012361.png',
-        'images/Paper173790012360.png'
-        ],
+  <!-- SCRIPT -->
+ <script>
+  function galleryApp() {
+    return {
+      selectedCategory: 'all',
 
-        lightboxOpen: false,
-        lightboxImage: '',
+      images: [],
+      lightboxOpen: false,
+      lightboxImage: '',
+      isDark: true,
 
-        openLightbox(img) {
-          this.lightboxImage = img;
-          this.lightboxOpen = true;
-        },
-        closeLightbox() {
-          this.lightboxOpen = false;
-          this.lightboxImage = '';
+      // ⚡ Injection directe des images ici
+      data: {
+        caleb: ["Caleb1.png", "Caleb2.png"],
+        rafayel: ["R1.png", "R2.png"],
+        sylus: ["S1.png", "S2.png"],
+        xavier: ["X1.png", "X2.png"],
+        zayne: ["Z1.png", "Z2.png"]
+      },
+
+      openLightbox(img) {
+        this.lightboxImage = img;
+        this.lightboxOpen = true;
+      },
+
+      closeLightbox() {
+        this.lightboxOpen = false;
+        this.lightboxImage = '';
+      },
+
+      toggleTheme() {
+        this.isDark = !this.isDark;
+        localStorage.setItem('theme', this.isDark ? 'dark' : 'light');
+      },
+
+      initTheme() {
+        const saved = localStorage.getItem('theme');
+        this.isDark = saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        this.setCategory(this.selectedCategory); // 🔄 charge les images au démarrage
+      },
+
+      setCategory(name) {
+        this.selectedCategory = name;
+
+        if (name === 'all') {
+          this.images = Object.entries(this.data).flatMap(([cat, files]) =>
+            files.map(file => `images/${cat}/${file}`)
+          );
+        } else {
+          this.images = this.data[name].map(file => `images/${name}/${file}`);
         }
       }
     }
-  </script>
+  }
+</script>
+
 
 </body>
 </html>

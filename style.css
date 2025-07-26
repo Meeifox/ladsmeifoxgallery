@@ -1,9 +1,30 @@
+/* ============================= */
+/* 🌙 Variables de thème         */
+/* ============================= */
+
+:root {
+  --bg: #ffffff;
+  --text: #000000;
+  --card-bg: #f0f0f0;
+}
+
+.dark {
+  --bg: #121212;
+  --text: #ffffff;
+  --card-bg: #1e1e1e;
+}
+
+/* ============================= */
+/* 🧱 Base globale               */
+/* ============================= */
+
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
-  background-color: #111;
-  color: #fff;
   padding: 20px;
+  font-family: Arial, sans-serif;
+  background-color: var(--bg);
+  color: var(--text);
+  transition: all 0.3s ease;
 }
 
 header {
@@ -11,7 +32,109 @@ header {
   margin-bottom: 40px;
 }
 
+/* ============================= */
+/* 🎛️ Thème switch button       */
+/* ============================= */
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 40px;
+  flex-wrap: wrap;
+}
+
+.page-header h1 {
+  font-size: 4rem;
+  flex-grow: 1;
+  text-align: center;
+}
+
+@media (max-width: 600px) {
+  .page-header {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .page-header h1 {
+    text-align: center;
+    margin-bottom: 10px;
+  }
+}
+
+.theme-toggle-fixed {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 999;
+  background: transparent;
+  border: 1px solid var(--text);
+  color: var(--text);
+  padding: 8px 10px;
+  border-radius: 5%;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(6px);
+}
+
+.theme-toggle-fixed:hover {
+  background-color: var(--card-bg);
+  opacity: 0.85;
+}
+
+/* ============================= */
+/* 🧱 Disposition horizontale    */
+/* ============================= */
+
+.content-wrapper {
+  display: flex;
+  gap: 30px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+/* ============================= */
+/* 📂 Menu latéral               */
+/* ============================= */
+
+.menu {
+  width: 200px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  padding-left: 20px;
+  margin-bottom: 30px;
+}
+
+.menu button {
+  padding: 6px 12px;
+  background-color: transparent;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+  font-size: 1rem;
+}
+
+.menu button:hover {
+  background-color: var(--card-bg);
+  opacity: 0.8;
+}
+
+.menu .active {
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+/* ============================= */
+/* 🖼️ Galerie                    */
+/* ============================= */
+
 .gallery {
+  flex: 1;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 20px;
@@ -21,6 +144,7 @@ header {
   width: 100%;
   border-radius: 10px;
   cursor: pointer;
+  background-color: var(--card-bg);
   transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
@@ -29,7 +153,10 @@ header {
   opacity: 0.9;
 }
 
-/* Lightbox */
+/* ============================= */
+/* 🔍 Lightbox                  */
+/* ============================= */
+
 .lightbox {
   position: fixed;
   top: 0;
@@ -58,4 +185,39 @@ header {
   border: none;
   color: white;
   cursor: pointer;
+}
+
+/* ============================= */
+/* 📱 Responsive                */
+/* ============================= */
+
+@media (max-width: 900px) {
+  .content-wrapper {
+    flex-direction: column;
+  }
+
+  .menu {
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding-left: 0;
+  }
+
+  .gallery {
+    width: 100%;
+  }
+}
+
+@media (max-width: 600px) {
+  .theme-toggle-fixed {
+    font-size: 1rem;
+    padding: 6px 8px;
+  }
+
+  .close-btn {
+    font-size: 1.6rem;
+    top: 10px;
+    right: 15px;
+  }
 }
