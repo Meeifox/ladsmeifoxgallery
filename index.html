@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="fr" x-data="galleryApp()">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ma Galerie 🖼️</title>
+  <link rel="stylesheet" href="style.css">
+  <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+<body>
+
+  <header>
+    <h1>✨ Galerie Meifox ✨</h1>
+  </header>
+
+  <main class="gallery">
+    <!-- Tu peux dupliquer ces blocs -->
+    <template x-for="(image, index) in images" :key="index">
+      <img 
+        :src="image" 
+        alt="Image galerie" 
+        @click="openLightbox(image)"
+      >
+    </template>
+  </main>
+
+  <!-- Lightbox -->
+  <div class="lightbox" x-show="lightboxOpen" @click.self="closeLightbox">
+    <img :src="lightboxImage" alt="Zoom" />
+    <button class="close-btn" @click="closeLightbox">✖</button>
+  </div>
+
+  <script>
+    function galleryApp() {
+      return {
+        images: [
+        'images/Paper175214657827.png',
+        'images/Paper1752005093252.png',
+        'images/Paper173790012361.png',
+        'images/Paper173790012360.png'
+        ],
+
+        lightboxOpen: false,
+        lightboxImage: '',
+
+        openLightbox(img) {
+          this.lightboxImage = img;
+          this.lightboxOpen = true;
+        },
+        closeLightbox() {
+          this.lightboxOpen = false;
+          this.lightboxImage = '';
+        }
+      }
+    }
+  </script>
+
+</body>
+</html>
