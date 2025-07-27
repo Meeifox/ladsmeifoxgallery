@@ -1,103 +1,145 @@
 <!DOCTYPE html>
-<html lang="fr" x-data="galleryApp()" :class="{ 'dark': isDark }" x-init="initTheme()">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ma Galerie 🖼️</title>
-  <link rel="stylesheet" href="style.css">
-  <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
-</head>
-<body>
 
-  <!-- HEADER -->
+<html :class="{ dark: isDark }" lang="fr" x-data="galleryApp()" x-init="init()">
+
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>✨ Galerie Meifox ✨</title>
+  <link href="style.css" rel="stylesheet" />
+  <script defer="" src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+
+
+<body>
   <header class="page-header">
     <h1>✨ Galerie Meifox ✨</h1>
     <button @click="toggleTheme" class="theme-toggle-fixed">
       <span x-text="isDark ? '☀️ Mode clair' : '🌙 Mode sombre'"></span>
     </button>
   </header>
-
-<div class="content-wrapper">
-  <!-- MENU -->
-  <nav class="menu">
-    <button @click="setCategory('all')" :class="{ 'active': selectedCategory === 'all' }">All 🖼️</button>
-    <button @click="setCategory('xavier')" :class="{ 'active': selectedCategory === 'xavier' }">Xavier ✨</button>
-    <button @click="setCategory('zayne')" :class="{ 'active': selectedCategory === 'zayne' }">Zayne 🍐</button>
-    <button @click="setCategory('rafayel')" :class="{ 'active': selectedCategory === 'rafayel' }">Rafayel 🐟</button>
-    <button @click="setCategory('sylus')" :class="{ 'active': selectedCategory === 'sylus' }">Sylus 🐦‍⬛</button>
-    <button @click="setCategory('caleb')" :class="{ 'active': selectedCategory === 'caleb' }">Caleb 🍎</button>
-  </nav>
-
-  <!-- GALERIE -->
-  <main class="gallery">
-    <template x-for="(image, index) in images" :key="index">
-      <img :src="image" alt="Image galerie" @click="openLightbox(image)">
-    </template>
-  </main>
-</div>
-
-  <!-- LIGHTBOX -->
-  <div class="lightbox" x-show="lightboxOpen" @click.self="closeLightbox">
-    <img :src="lightboxImage" alt="Zoom" />
-    <button class="close-btn" @click="closeLightbox">✖</button>
+  <div class="content-wrapper">
+    <!-- MENU -->
+    <aside class="sidebar">
+      <nav class="menu"><button :class="{ 'active': selectedCategory === 'all' }" @click="setCategory('all')">All
+          🖼️</button><button :class="{ 'active': selectedCategory === 'caleb' }" @click="setCategory('caleb')"
+          x-html="emojiMap['caleb'] + ' ' + capitalize('caleb')"></button><button
+          :class="{ 'active': selectedCategory === 'mc' }" @click="setCategory('mc')"
+          x-html="emojiMap['mc'] + ' ' + capitalize('mc')"></button><button
+          :class="{ 'active': selectedCategory === 'rafayel' }" @click="setCategory('rafayel')"
+          x-html="emojiMap['rafayel'] + ' ' + capitalize('rafayel')"></button><button
+          :class="{ 'active': selectedCategory === 'sylus' }" @click="setCategory('sylus')"
+          x-html="emojiMap['sylus'] + ' ' + capitalize('sylus')"></button><button
+          :class="{ 'active': selectedCategory === 'xavier' }" @click="setCategory('xavier')"
+          x-html="emojiMap['xavier'] + ' ' + capitalize('xavier')"></button><button
+          :class="{ 'active': selectedCategory === 'zayne' }" @click="setCategory('zayne')"
+          x-html="emojiMap['zayne'] + ' ' + capitalize('zayne')"></button></nav>
+      </aside>
+    <!-- GALERIE -->
+    <main class="gallery">
+      <template :key="img.src" x-for="img in filteredImages">
+        <div class="image-wrapper">
+          <img :alt="`${img.category} - galerie`" :src="img.src" @click="openLightbox(img.src)" />
+        </div>
+      </template>
+    </main>
   </div>
-
+  <!-- LIGHTBOX -->
+  <div @click.self="closeLightbox" class="lightbox" x-show="lightboxOpen">
+    <img :src="lightboxImage" alt="Zoom">
+    <button @click="closeLightbox" class="close-btn">✖</button>
+    </img>
+  </div>
+  <!-- BOUTTON TO TOP -->
+<button id="toTopBtn" title="Retour en haut">🔝</button>
+</body>
+</html>
   <!-- SCRIPT -->
- <script>
-  function galleryApp() {
-    return {
-      selectedCategory: 'all',
+  <script>
+    document.addEventListener('alpine:init', () => {
+      Alpine.data('galleryApp', () => ({
+        images: {},
+        selectedCategory: 'all',
+        allImages: [],
+        lightboxOpen: false,
+        lightboxImage: '',
+        isDark: true,
 
-      images: [],
-      lightboxOpen: false,
-      lightboxImage: '',
-      isDark: true,
+        emojiMap: {
+          caleb: '🍎',
+          rafayel: '🐟',
+          sylus: '🐦‍⬛',
+          xavier: '✨',
+          zayne: '🍐',
+          mc: '💄'
+        },
 
-      // ⚡ Injection directe des images ici
-      data: {
-        caleb: ["Caleb1.png", "Caleb2.png"],
-        rafayel: ["R1.png", "R2.png"],
-        sylus: ["S1.png", "S2.png"],
-        xavier: ["X1.png", "X2.png"],
-        zayne: ["Z1.png", "Z2.png"]
-      },
+        capitalize(str) {
+          return str.charAt(0).toUpperCase() + str.slice(1);
+        },
 
-      openLightbox(img) {
-        this.lightboxImage = img;
-        this.lightboxOpen = true;
-      },
+        async init() {
+          const saved = localStorage.getItem('theme');
+          this.isDark = saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches);
+          try {
+            const res = await fetch('./images.json');
+            const json = await res.json();
+            this.images = json;
+            this.allImages = Object.entries(this.images).flatMap(([category, files]) =>
+              files.map(filename => ({
+                src: `images/${category}/${filename}`,
+                category
+              }))
+            );
+          } catch (err) {
+            console.error("Erreur chargement images.json", err);
+          }
+        },
 
-      closeLightbox() {
-        this.lightboxOpen = false;
-        this.lightboxImage = '';
-      },
+        toggleTheme() {
+          this.isDark = !this.isDark;
+          localStorage.setItem('theme', this.isDark ? 'dark' : 'light');
+        },
 
-      toggleTheme() {
-        this.isDark = !this.isDark;
-        localStorage.setItem('theme', this.isDark ? 'dark' : 'light');
-      },
+        setCategory(cat) {
+          this.selectedCategory = cat;
+        },
 
-      initTheme() {
-        const saved = localStorage.getItem('theme');
-        this.isDark = saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches);
-        this.setCategory(this.selectedCategory); // 🔄 charge les images au démarrage
-      },
+        get filteredImages() {
+          if (this.selectedCategory === 'all') return this.allImages;
+          return this.allImages.filter(img => img.category === this.selectedCategory);
+        },
 
-      setCategory(name) {
-        this.selectedCategory = name;
+        openLightbox(src) {
+          this.lightboxImage = src;
+          this.lightboxOpen = true;
+        },
 
-        if (name === 'all') {
-          this.images = Object.entries(this.data).flatMap(([cat, files]) =>
-            files.map(file => `images/${cat}/${file}`)
-          );
-        } else {
-          this.images = this.data[name].map(file => `images/${name}/${file}`);
+        closeLightbox() {
+          this.lightboxOpen = false;
+          this.lightboxImage = '';
         }
-      }
+      }));
+    });
+
+  const toTopBtn = document.getElementById("toTopBtn");
+
+  window.addEventListener("scroll", () => {
+    if (window.scrollY > 300) {
+      toTopBtn.classList.add("show");
+    } else {
+      toTopBtn.classList.remove("show");
     }
-  }
+  });
+
+  toTopBtn.addEventListener("click", () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+  });
 </script>
 
-
 </body>
+
 </html>
